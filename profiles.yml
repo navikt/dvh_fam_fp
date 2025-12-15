@@ -1,4 +1,4 @@
-dvh_fam_fp_dbt:
+dvh_fam_fp:
   target: "{{env_var('DBT_DB_TARGET')}}"
   outputs:
     U:
@@ -8,12 +8,13 @@ dvh_fam_fp_dbt:
       protocol: tcp
       host: dmv04-scan.adeo.no
       port: 1521
+      dbname: dwhu1
       service: ccdwhu1_ha
       schema: "{{env_var('DBT_DB_SCHEMA')}}"
       threads: 10
       session_info:
         client_info: "{{env_var('DBT_ORCL_USER_PROXY', 'DVH_FAM_DBT')}}"
-        module: "{{env_var('AIRFLOW_DAG_ID', 'dvh_fam_fp_dbt')}}"
+        module: "{{env_var('AIRFLOW_DAG_ID', 'dvh_fam_fp')}}"
         action: "Kjører utpakking av foreldrepenger data"
     R:
       type: oracle
@@ -22,12 +23,13 @@ dvh_fam_fp_dbt:
       protocol: tcp
       host: dmv04-scan.adeo.no
       port: 1521
+      dbname: dwhpr
       service: dwhr_ha
       schema: "{{env_var('DBT_DB_SCHEMA')}}"
       threads: 10
       session_info:
         client_info: "{{env_var('DBT_ORCL_USER_PROXY', 'DVH_FAM_DBT')}}"
-        module: "{{env_var('AIRFLOW_DAG_ID', 'dvh_fam_fp_dbt')}}"
+        module: "{{env_var('AIRFLOW_DAG_ID', 'dvh_fam_fp')}}"
         action: "Kjører utpakking av foreldrepenger data"
     P:
       type: oracle
@@ -36,12 +38,13 @@ dvh_fam_fp_dbt:
       protocol: tcp
       host: dmv09-scan.adeo.no
       port: 1521
+      dbname: dwhpr
       service: dwh_ha
       schema: "{{env_var('DBT_DB_SCHEMA')}}"
       threads: 10
       session_info:
         client_info: "{{env_var('DBT_ORCL_USER_PROXY', 'DVH_FAM_DBT')}}"
-        module: "{{env_var('AIRFLOW_DAG_ID', 'dvh_fam_fp_dbt')}}"
+        module: "{{env_var('AIRFLOW_DAG_ID', 'dvh_fam_fp')}}"
         action: "Kjører utpakking av foreldrepenger data"
 config:
   send_anonymous_usage_stats: False
