@@ -12,8 +12,8 @@ WITH fp_meta_data AS (
         melding,
         b.kafka_offset C
     FROM
-        {{ source('fam_fp','fam_fp_meta_data'}} A
-        LEFT OUTER JOIN {{ source('fam_fp','json_fam_fp_fagsak'}} b
+        {{ source('fam_fp','fam_fp_meta_data')}} A
+        LEFT OUTER JOIN {{ source('fam_fp','json_fam_fp_fagsak')}} b
         ON A.kafka_offset = b.kafka_offset
         AND A.kafka_partition = b.kafka_partition
     WHERE
