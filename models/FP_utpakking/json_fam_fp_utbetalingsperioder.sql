@@ -16,19 +16,19 @@ pre_final as (
   select fp_meta_data.kafka_offset, j.*
   from fp_meta_data
       ,json_table(melding, '$' COLUMNS (
-          saksnummer                       VARCHAR2(255) PATH '$.saksnummer'
-         ,fagsak_id                        VARCHAR2(255) PATH '$.fagsakId'
+          saksnummer                       NUMBER PATH '$.saksnummer'
+         ,fagsak_id                        NUMBER PATH '$.fagsakId'
          ,behandling_uuid                  VARCHAR2(255) PATH '$.behandlingUuid'
          ,nested PATH '$.utbetalingssperioder[*]' COLUMNS (
             seq_i_array                 FOR ORDINALITY
-           ,fom                            VARCHAR2(255) PATH '$.fom'
-           ,tom                            VARCHAR2(255) PATH '$.tom'
+           ,fom                            DATE PATH '$.fom'
+           ,tom                            DATE PATH '$.tom'
            ,inntektskategori               VARCHAR2(255) PATH '$.inntektskategori'
            ,arbeidsgiver                   VARCHAR2(255) PATH '$.arbeidsgiver'
            ,mottaker                       VARCHAR2(255) PATH '$.mottaker'
-           ,dagsats                        VARCHAR2(255) PATH '$.dagsats'
-           ,dagsats_fra_beregningsgrunnlag VARCHAR2(255) PATH '$.dagsatsFraBeregningsgrunnlag'
-           ,utbetalingsgrad                VARCHAR2(255) PATH '$.utbetalingsgrad'
+           ,dagsats                        NUMBER PATH '$.dagsats'
+           ,dagsats_fra_beregningsgrunnlag NUMBER PATH '$.dagsatsFraBeregningsgrunnlag'
+           ,utbetalingsgrad                NUMBER PATH '$.utbetalingsgrad'
           ) ) ) j
   where j.fom is not null
 ),
@@ -36,14 +36,14 @@ pre_final as (
 final as (
   select
     p.seq_i_array
-   ,to_date(p.fom, 'yyyy-mm-dd') as fom
-   ,to_date(p.tom, 'yyyy-mm-dd') as tom
+   ,p.fom
+   ,p.tom
    ,p.inntektskategori
    ,p.arbeidsgiver
    ,p.mottaker
-   ,to_number(p.dagsats) dagsats
-   ,to_number(p.dagsats_fra_beregningsgrunnlag) dagsats_fra_beregningsgrunnlag
-   ,to_number(p.utbetalingsgrad) utbetalingsgrad
+   ,p.dagsats
+   ,p.dagsats_fra_beregningsgrunnlag
+   ,p.utbetalingsgrad
    ,fp_fagsak.pk_fp_fagsak as fk_fp_fagsak
    ,p.kafka_offset
   from pre_final p

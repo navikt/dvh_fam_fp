@@ -13,32 +13,32 @@ pre_final as (
   from fp_meta_data
       ,json_table(melding, '$'
         COLUMNS (
-          saksnummer                 VARCHAR2(255) PATH '$.saksnummer'
-         ,fagsak_id                  VARCHAR2(255) PATH '$.fagsakId'
+          saksnummer                 NUMBER PATH '$.saksnummer'
+         ,fagsak_id                  NUMBER PATH '$.fagsakId'
          ,ytelse_type                VARCHAR2(255) PATH '$.ytelseType'
          ,lov_versjon                VARCHAR2(255) PATH '$.lovVersjon'
          ,behandling_uuid            VARCHAR2(255) PATH '$.behandlingUuid'
          ,forrige_behandling_uuid    VARCHAR2(255) PATH '$.forrigeBehandlingUuid'
          ,revurdering_aarsak         VARCHAR2(255) PATH '$.revurderingÅrsak'
-         ,soknadsdato                VARCHAR2(255) PATH '$.søknadsdato'
-         ,skjaeringstidspunkt        VARCHAR2(255) PATH '$.skjæringstidspunkt'
-         ,vedtakstidspunkt           VARCHAR2(255) PATH '$.vedtakstidspunkt'
+         ,soknadsdato                DATE PATH '$.søknadsdato'
+         ,skjaeringstidspunkt        DATE PATH '$.skjæringstidspunkt'
+         ,vedtakstidspunkt           TIMESTAMP(6) PATH '$.vedtakstidspunkt'
          ,vedtaksresultat            VARCHAR2(255) PATH '$.vedtaksresultat'
          ,vilkaar_ikke_oppfylt       VARCHAR2(255) PATH '$.vilkårIkkeOppfylt'
-         ,soker_aktor_id             VARCHAR2(255) PATH '$.søker'
+         ,soker_aktor_id             NUMBER PATH '$.søker'
          ,saksrolle                  VARCHAR2(255) PATH '$.saksrolle'
          ,utlands_tilsnitt           VARCHAR2(255) PATH '$.utlandsTilsnitt'
-         ,annen_forelder_aktor_id    VARCHAR2(255) PATH '$.annenForelder.aktørId'
-         ,annen_forelder_saksnummer  VARCHAR2(255) PATH '$.annenForelder.saksnummer'
+         ,annen_forelder_aktor_id    NUMBER PATH '$.annenForelder.aktørId'
+         ,annen_forelder_saksnummer  NUMBER PATH '$.annenForelder.saksnummer'
          ,annen_forelder_ytelse_type VARCHAR2(255) PATH '$.annenForelder.ytelseType'
          ,annen_forelder_saksrolle   VARCHAR2(255) PATH '$.annenForelder.saksrolle'
-         ,termindato                 VARCHAR2(255) PATH '$.familieHendelse.termindato'
-         ,adopsjonsdato              VARCHAR2(255) PATH '$.familieHendelse.adopsjonsdato'
-         ,antall_barn                VARCHAR2(255) PATH '$.familieHendelse.antallBarn'
-         ,fodselsdato                VARCHAR2(255) PATH '$.familieHendelse.barn[0].fødselsdato'
+         ,termindato                 DATE PATH '$.familieHendelse.termindato'
+         ,adopsjonsdato              DATE PATH '$.familieHendelse.adopsjonsdato'
+         ,antall_barn                NUMBER PATH '$.familieHendelse.antallBarn'
+         ,fodselsdato                DATE PATH '$.familieHendelse.barn[0].fødselsdato'
          ,hendelse_type              VARCHAR2(255) PATH '$.familieHendelse.hendelseType'
-         ,utbetalingsreferanse       VARCHAR2(255) PATH '$.utbetalingsreferanse'
-         ,behandling_id              VARCHAR2(255) PATH '$.behandlingId'
+         ,utbetalingsreferanse       NUMBER PATH '$.utbetalingsreferanse'
+         ,behandling_id              NUMBER PATH '$.behandlingId'
          ,engangsstonad_innvilget    VARCHAR2(255) PATH '$.engangsstønadInnvilget'
          ,dekningsgrad               VARCHAR2(255) PATH '$.foreldrepengerRettigheter.dekningsgrad'
          ,rettighet_type             VARCHAR2(255) PATH '$.foreldrepengerRettigheter.rettighetType'
@@ -55,7 +55,7 @@ pre_final_dager as
   from fp_meta_data
       ,json_table(melding, '$'
         COLUMNS (
-          saksnummer                 VARCHAR2(255) PATH '$.saksnummer'
+          saksnummer                 NUMBER PATH '$.saksnummer'
          ,behandling_uuid            VARCHAR2(255) PATH '$.behandlingUuid'
          ,nested PATH '$.foreldrepengerRettigheter.stønadsutvidelser[*]' COLUMNS (
             type  VARCHAR2(255) PATH '$.type'
@@ -72,12 +72,9 @@ final as (
     ,p.behandling_uuid
     ,p.forrige_behandling_uuid
     ,p.revurdering_aarsak
-    ,to_date(p.soknadsdato, 'yyyy-mm-dd') as soknadsdato
-    ,to_date(p.skjaeringstidspunkt, 'yyyy-mm-dd') as skjaeringstidspunkt
-    ,CASE
-      WHEN LENGTH(vedtakstidspunkt) = 25 THEN CAST(to_timestamp_tz(vedtakstidspunkt, 'yyyy-mm-dd"T"hh24:mi:ss TZH:TZM') AT TIME ZONE 'Europe/Belgrade' AS TIMESTAMP)
-      ELSE CAST(to_timestamp_tz(vedtakstidspunkt, 'YYYY-MM-DD"T"HH24:MI:SS.FF3 TZH:TZM') AT TIME ZONE 'Europe/Belgrade' AS TIMESTAMP)
-      END vedtakstidspunkt
+    ,p.soknadsdato
+    ,p.skjaeringstidspunkt
+    ,vedtakstidspunkt
     ,p.vedtaksresultat
     ,p.vilkaar_ikke_oppfylt
     ,p.soker_aktor_id
@@ -87,10 +84,10 @@ final as (
     ,p.annen_forelder_saksnummer
     ,p.annen_forelder_ytelse_type
     ,p.annen_forelder_saksrolle
-    ,to_date(p.termindato, 'yyyy-mm-dd') as termindato
-    ,to_date(p.adopsjonsdato, 'yyyy-mm-dd') as adopsjonsdato
+    ,p.termindato
+    ,p.adopsjonsdato
     ,p.antall_barn
-    ,to_date(p.fodselsdato, 'yyyy-mm-dd') as fodselsdato
+    ,p.fodselsdato
     ,p.hendelse_type
     ,p.utbetalingsreferanse
     ,p.behandling_id

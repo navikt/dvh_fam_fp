@@ -16,14 +16,14 @@ pre_final as (
   select fp_meta_data.kafka_offset, j.*
   from fp_meta_data
       ,json_table(melding, '$' COLUMNS (
-          saksnummer      VARCHAR2(255) PATH '$.saksnummer'
-         ,fagsak_id       VARCHAR2(255) PATH '$.fagsakId'
+          saksnummer      NUMBER PATH '$.saksnummer'
+         ,fagsak_id       NUMBER PATH '$.fagsakId'
          ,behandling_uuid VARCHAR2(255) PATH '$.behandlingUuid'
          ,nested PATH '$.foreldrepengerRettigheter.stønadskonti[*]' COLUMNS (
             type           VARCHAR2(255) PATH '$.type'
-           ,maksdager      VARCHAR2(255) PATH '$.maksdager'
-           ,restdager      VARCHAR2(255) PATH '$.restdager'
-           ,minsterett     VARCHAR2(255) PATH '$.minsterett'
+           ,maksdager      NUMBER PATH '$.maksdager'
+           ,restdager      NUMBER PATH '$.restdager'
+           ,minsterett     NUMBER PATH '$.minsterett'
           ) ) ) j
   where j.type is not null
 ),
@@ -31,9 +31,9 @@ pre_final as (
 final as (
   select
     p.type
-   ,to_number(p.maksdager) maksdager
-   ,to_number(p.restdager) restdager
-   ,to_number(p.minsterett) minsterett
+   ,p.maksdager
+   ,p.restdager
+   ,p.minsterett
    ,fp_fagsak.pk_fp_fagsak as fk_fp_fagsak
    ,p.kafka_offset
   from pre_final p

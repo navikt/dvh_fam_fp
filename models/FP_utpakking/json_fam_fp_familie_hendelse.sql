@@ -16,13 +16,13 @@ pre_final as (
   select fp_meta_data.kafka_offset, j.*
   from fp_meta_data
       ,json_table(melding, '$' COLUMNS (
-          saksnummer      VARCHAR2(255) PATH '$.saksnummer'
-         ,fagsak_id       VARCHAR2(255) PATH '$.fagsakId'
+          saksnummer      NUMBER PATH '$.saksnummer'
+         ,fagsak_id       NUMBER PATH '$.fagsakId'
          ,behandling_uuid VARCHAR2(255) PATH '$.behandlingUuid'
          ,nested PATH '$.familieHendelse.barn[*]' COLUMNS (
             barn_aktor_id  VARCHAR2(255) PATH '$.aktørId'
-           ,fodselsdato    VARCHAR2(255) PATH '$.fødselsdato'
-           ,dodsdato       VARCHAR2(255) PATH '$.dødsdato'
+           ,fodselsdato    DATE PATH '$.fødselsdato'
+           ,dodsdato       DATE PATH '$.dødsdato'
           ) ) ) j
   where j.barn_aktor_id is not null
 ),
@@ -31,8 +31,8 @@ final as (
   select
     p.barn_aktor_id
    ,ident.fk_person1 as barn_fk_person1
-   ,to_date(p.fodselsdato, 'yyyy-mm-dd') as fodselsdato
-   ,to_date(p.dodsdato, 'yyyy-mm-dd') as dodsdato
+   ,p.fodselsdato
+   ,p.dodsdato
    ,fp_fagsak.pk_fp_fagsak as fk_fp_fagsak
    ,p.kafka_offset
   from pre_final p

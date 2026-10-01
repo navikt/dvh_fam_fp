@@ -16,43 +16,43 @@ pre_final as (
   select fp_meta_data.kafka_offset, j.*
   from fp_meta_data
       ,json_table(melding, '$' COLUMNS (
-          saksnummer      VARCHAR2(255) PATH '$.saksnummer'
-         ,fagsak_id       VARCHAR2(255) PATH '$.fagsakId'
+          saksnummer      NUMBER PATH '$.saksnummer'
+         ,fagsak_id       NUMBER PATH '$.fagsakId'
          ,behandling_uuid VARCHAR2(255) PATH '$.behandlingUuid'
          ,nested PATH '$.beregning' COLUMNS (
-            grunnbelop         VARCHAR2(255) PATH '$.grunnbeløp'
+            grunnbelop         NUMBER PATH '$.grunnbeløp'
            ,hjemmel            VARCHAR2(255) PATH '$.hjemmel'
            ,fastsatt           VARCHAR2(255) PATH '$.fastsatt'
-           ,aarsbelop_brutto   VARCHAR2(255) PATH '$.årsbeløp.brutto'
-           ,aarsbelop_avkortet VARCHAR2(255) PATH '$.årsbeløp.avkortet'
-           ,aarsbelop_redusert VARCHAR2(255) PATH '$.årsbeløp.redusert'
-           ,aarsbelop_dagsats  VARCHAR2(255) PATH '$.årsbeløp.dagsats'
+           ,aarsbelop_brutto   NUMBER PATH '$.årsbeløp.brutto'
+           ,aarsbelop_avkortet NUMBER PATH '$.årsbeløp.avkortet'
+           ,aarsbelop_redusert NUMBER PATH '$.årsbeløp.redusert'
+           ,aarsbelop_dagsats  NUMBER PATH '$.årsbeløp.dagsats'
            ,nested PATH '$.andeler[*]' COLUMNS (
               andeler_aktivitet          VARCHAR2(255) PATH '$.aktivitet'
              ,andeler_arbeidsgiver       VARCHAR2(255) PATH '$.arbeidsgiver'
-             ,andeler_aarsbelop_brutto   VARCHAR2(255) PATH '$.årsbeløp.brutto'
-             ,andeler_aarsbelop_avkortet VARCHAR2(255) PATH '$.årsbeløp.avkortet'
-             ,andeler_aarsbelop_redusert VARCHAR2(255) PATH '$.årsbeløp.redusert'
-             ,andeler_aarsbelop_dagsats  VARCHAR2(255) PATH '$.årsbeløp.dagsats'
+             ,andeler_aarsbelop_brutto   NUMBER PATH '$.årsbeløp.brutto'
+             ,andeler_aarsbelop_avkortet NUMBER PATH '$.årsbeløp.avkortet'
+             ,andeler_aarsbelop_redusert NUMBER PATH '$.årsbeløp.redusert'
+             ,andeler_aarsbelop_dagsats  NUMBER PATH '$.årsbeløp.dagsats'
            ) ) ) ) j
   where j.grunnbelop is not null
 ),
 
 final as (
   select
-    to_number(p.grunnbelop) grunnbelop
+    p.grunnbelop
    ,hjemmel
    ,fastsatt
-   ,to_number(p.aarsbelop_brutto) aarsbelop_brutto
-   ,to_number(p.aarsbelop_avkortet) aarsbelop_avkortet
-   ,to_number(p.aarsbelop_redusert) aarsbelop_redusert
-   ,to_number(p.aarsbelop_dagsats) aarsbelop_dagsats
+   ,p.aarsbelop_brutto
+   ,p.aarsbelop_avkortet
+   ,p.aarsbelop_redusert
+   ,p.aarsbelop_dagsats
    ,p.andeler_aktivitet
    ,p.andeler_arbeidsgiver
-   ,to_number(p.andeler_aarsbelop_brutto) andeler_aarsbelop_brutto
-   ,to_number(p.andeler_aarsbelop_avkortet) andeler_aarsbelop_avkortet
-   ,to_number(p.andeler_aarsbelop_redusert) andeler_aarsbelop_redusert
-   ,to_number(p.andeler_aarsbelop_dagsats) andeler_aarsbelop_dagsats
+   ,p.andeler_aarsbelop_brutto
+   ,p.andeler_aarsbelop_avkortet
+   ,p.andeler_aarsbelop_redusert
+   ,p.andeler_aarsbelop_dagsats
    ,fp_fagsak.pk_fp_fagsak as fk_fp_fagsak
    ,p.kafka_offset
   from pre_final p

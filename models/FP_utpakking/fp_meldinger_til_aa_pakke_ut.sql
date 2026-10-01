@@ -17,7 +17,7 @@ WITH fp_meta_data AS (
         ON A.kafka_offset = b.kafka_offset
         AND A.kafka_partition = b.kafka_partition
     WHERE
-        A.kafka_mottatt_dato >= SYSDATE - 30
+        A.kafka_mottatt_dato >= SYSDATE - 90
         AND b.kafka_offset IS NULL
 )
 SELECT

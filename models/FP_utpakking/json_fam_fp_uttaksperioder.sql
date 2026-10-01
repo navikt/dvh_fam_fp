@@ -16,24 +16,24 @@ pre_final as (
   select fp_meta_data.kafka_offset, j.*
   from fp_meta_data
       ,json_table(melding, '$' COLUMNS (
-          saksnummer                 VARCHAR2(255) PATH '$.saksnummer'
-         ,fagsak_id                  VARCHAR2(255) PATH '$.fagsakId'
+          saksnummer                 NUMBER PATH '$.saksnummer'
+         ,fagsak_id                  NUMBER PATH '$.fagsakId'
          ,behandling_uuid            VARCHAR2(255) PATH '$.behandlingUuid'
          ,nested PATH '$.uttaksperioder[*]' COLUMNS (
             seq_i_array           FOR ORDINALITY
-           ,fom                      VARCHAR2(255) PATH '$.fom'
-           ,tom                      VARCHAR2(255) PATH '$.tom'
+           ,fom                      DATE PATH '$.fom'
+           ,tom                      DATE PATH '$.tom'
            ,type                     VARCHAR2(255) PATH '$.type'
            ,stonadskonto_type        VARCHAR2(255) PATH '$.stønadskontoType'
            ,rettighet_type           VARCHAR2(255) PATH '$.rettighetType'
            ,forklaring               VARCHAR2(255) PATH '$.forklaring'
-           ,soknadsdato              VARCHAR2(255) PATH '$.søknadsdato'
+           ,soknadsdato              DATE PATH '$.søknadsdato'
            ,er_utbetaling            VARCHAR2(255) PATH '$.erUtbetaling'
-           ,virkedager               number PATH '$.virkedager'
-           ,trekkdager               number PATH '$.trekkdager'
+           ,virkedager               NUMBER PATH '$.virkedager'
+           ,trekkdager               NUMBER PATH '$.trekkdager'
            ,gradering_aktivitet_type VARCHAR2(255) PATH '$.gradering.aktivitetType'
-           ,gradering_arbeidsprosent number PATH '$.gradering.arbeidsprosent'
-           ,samtidig_uttak_prosent   number PATH '$.samtidigUttakProsent'
+           ,gradering_arbeidsprosent NUMBER PATH '$.gradering.arbeidsprosent'
+           ,samtidig_uttak_prosent   NUMBER PATH '$.samtidigUttakProsent'
           ) ) ) j
   where j.fom is not null
 ),
@@ -41,13 +41,13 @@ pre_final as (
 final as (
   select
     p.seq_i_array
-   ,to_date(p.fom, 'yyyy-mm-dd') as fom
-   ,to_date(p.tom, 'yyyy-mm-dd') as tom
+   ,p.fom
+   ,p.tom
    ,p.type
    ,p.stonadskonto_type
    ,p.rettighet_type
    ,p.forklaring
-   ,to_date(p.soknadsdato, 'yyyy-mm-dd') as soknadsdato
+   ,p.soknadsdato
    ,p.er_utbetaling
    ,p.virkedager
    ,p.trekkdager
